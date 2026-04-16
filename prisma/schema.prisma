@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Responsavel{
+  id Int @id @default(autoincrement()) // id do responsavel
+  nome String // nome do responsavel
+  email String @unique //email do responsavel
+  telefone String //telefone do responsavvel
+  senha String   // senha para cadastro
+  dependentes Dependente[] //dependentes ligados aquela usuario
+}
+
+model Dependente{
+  id Int @id @default(autoincrement()) //id dos dependentes
+  nome String //nome dos dependentes
+  parentesco String // grau de parentesco com Responsavel
+  dataNascimento DateTime? //data de Nascimento (opcional)
+
+  latitudeCentro  Float?       // Latitude do ponto central (ex: casa ou escola)
+  longitudeCentro Float?       // Longitude do ponto central
+  raioSeguranca   Float @default(500) //raio de seguranca, se vazio, assumira 500 metros
+
+  responsavelID Int
+  responsavel Responsavel @relation (fields:[responsavelID], references:[id]) //referencia ao responsavel pelo dependente
+  alertas Alerta[]
+
+}
+
+model Alerta{
+  id Int @id @default(autoincrement()) //id de alerta
+  titulo String //titulo do alerta
+  descricao String //descricao do alerta
+  dataCriacao    DateTime @default(now()) //criacao do alerta
+
+  latitudeAtual  Float //localizacao atual 
+  longitudeAtual Float //localizacao atual 
+
+  dependenteId Int
+  dependente   Dependente @relation(fields: [dependenteId], references: [id]) //referencia ao dependente que causou o alerta
+} 
